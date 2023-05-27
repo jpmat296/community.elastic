@@ -1,0 +1,78 @@
+---
+- vars:
+    elastic_index_parameters: &elastic_index_parameters
+      login_user: elastic
+      login_password: secret
+      auth_method: http_auth
+      timeout: 30
+
+  block:
+
+  - name: Create a component template
+    community.elastic.elastic_component_template:
+      name: "{{ item }}"
+      src: "{{ role_path }}/files/{{ item }}.json"
+      <<: *elastic_index_parameters
+    with_items:
+      - 02_shards
+      - 02_shards_1rep
+
+  - name: Create an index template
+    community.elastic.elastic_index_template:
+      name: index123
+      src: "{{ role_path }}/files/index123.json"
+      <<: *elastic_index_parameters
+    register: elastic
+
+  - assert:
+      that:
+        - "elastic.changed == True"
+        - "'The index template index123 was successfully created' in elastic.msg"
+
+  - name: Create index template again - should be updated
+    community.elastic.elastic_index_template:
+      name: index123
+      src: "{{ role_path }}/files/index123_1rep.json"
+      <<: *elastic_index_parameters
+    register: elastic
+
+  - assert:
+      that:
+        - "elastic.changed == True"
+        - "'The index template index123 was successfully updated' in elastic.msg"
+
+  - name: Create index template again - should NOT be updated
+    community.elastic.elastic_index_template:
+      name: index123
+      src: "{{ role_path }}/files/index123_1rep.json"
+      <<: *elastic_index_parameters
+    register: elastic
+
+  - assert:
+      that:
+        - "elastic.changed == False"
+        - "elastic.msg == 'The index template index123 already exists as configured.'"
+
+  - name: Delete index template
+    community.elastic.elastic_index_template:
+      name: index123
+      state: absent
+      <<: *elastic_index_parameters
+    register: elastic
+
+  - assert:
+      that:
+        - "elastic.changed == True"
+        - "elastic.msg == 'The index template index123 was deleted.'"
+
+  - name: Delete index template again
+    community.elastic.elastic_index_template:
+      name: index123
+      state: absent
+      <<: *elastic_index_parameters
+    register: elastic
+
+  - assert:
+      that:
+        - "elastic.changed == False"
+        - "elastic.msg == 'The index template index123 does not exist.'"
