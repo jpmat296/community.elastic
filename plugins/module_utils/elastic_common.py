@@ -55,7 +55,6 @@ class ElasticHelpers():
                 auth["http_auth"] = (module.params['login_user'],
                                      module.params['login_password'])
 
-                auth["http_scheme"] = module.params['auth_scheme']
                 if module.params['cafile'] is not None:
                     from ssl import create_default_context
                     context = create_default_context(module.params['cafile'])
