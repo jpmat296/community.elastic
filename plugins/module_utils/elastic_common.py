@@ -25,13 +25,11 @@ def elastic_common_argument_spec():
     """
     options = dict(
         auth_method=dict(type='str', choices=['', 'http_auth'], default=''),
-        auth_scheme=dict(type='str', choices=['http', 'https'], default='http'),
         cafile=dict(type='str', default=None),
         connection_options=dict(type='list', elements='dict', default=[]),
         login_user=dict(type='str', required=False),
         login_password=dict(type='str', required=False, no_log=True),
-        login_hosts=dict(type='list', elements='str', required=False, default=['localhost']),
-        login_port=dict(type='int', required=False, default=9200),
+        login_hosts=dict(type='list', elements='str', required=False, default=['http://localhost:9200']),
         timeout=dict(type='int', default=30),
     )
     return options
@@ -55,7 +53,6 @@ class ElasticHelpers():
                 auth["http_auth"] = (module.params['login_user'],
                                      module.params['login_password'])
 
-                auth["http_scheme"] = module.params['auth_scheme']
                 if module.params['cafile'] is not None:
                     from ssl import create_default_context
                     context = create_default_context(module.params['cafile'])
@@ -66,10 +63,7 @@ class ElasticHelpers():
 
     def connect(self):
         auth = self.build_auth(self.module)
-        hosts = list(map(lambda host: "{0}://{1}:{2}/".format(self.module.params['auth_scheme'],
-                                                              host,
-                                                              self.module.params['login_port']),
-                         self.module.params['login_hosts']))
+        hosts = self.module.params['login_hosts']
         elastic = Elasticsearch(hosts,
                                 timeout=self.module.params['timeout'],
                                 *self.module.params['connection_options'],

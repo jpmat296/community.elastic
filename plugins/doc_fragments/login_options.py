@@ -14,14 +14,6 @@ options:
        - ''
        - http_auth
     default: ''
-  auth_scheme:
-    description:
-      - Authentication scheme.
-    type: str
-    choices:
-       - http
-       - https
-    default: http
   cafile:
     description:
       - Path to ca file
@@ -50,13 +42,7 @@ options:
     required: no
     type: list
     elements: str
-    default: 'localhost'
-  login_port:
-    description:
-      - The Elastic server port to login to.
-    required: no
-    type: int
-    default: 9200
+    default: 'http://localhost:9200'
   timeout:
     description:
       - Response timeout in seconds.
