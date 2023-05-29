@@ -42,11 +42,13 @@
 - debug:
     var: docker_compose
 
+# Creating single-node-01 ... done
+# Container single-node-01  Created
 - name: Set container_name using docker-compose output
   set_fact:
     container_name: "{{
       (
-        docker_compose.stderr_lines | select('search', 'Created') | select('search', 'Container') | list
+        docker_compose.stderr_lines | select('search', 'Creating') | select('search', 'done') | list
       )[0].split()[1]
       }}"
 
