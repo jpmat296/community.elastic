@@ -36,7 +36,16 @@
   environment:
     ELASTICSEARCH_VERSION: "{{ elasticsearch_version }}"
     KIBANA_VERSION: "{{ kibana_version }}"
+  register: docker_compose
   notify: Clean up docker containers and volumes
+
+- name: Set container_name using docker-compose output
+  set_fact:
+    container_name: "{{
+      (
+        docker_compose.stderr_lines | select('search', 'Created') | select('search', 'Container') | list
+      )[0].split()[1]
+      }}"
 
 - name: Set elastic_ports to 9200 when using a single node
   set_fact:
@@ -62,3 +71,24 @@
   until: '"You Know, for Search" in _result.content or "missing authentication credentials for REST request" in _result.content'
   retries: 30 # retry X times
   delay: 3 # pause for X sec b/w each call
+
+- name: Reset elastic user password to temporary value
+  community.docker.docker_container_exec:
+    container: "{{ container_name }}"
+    command: /usr/share/elasticsearch/bin/elasticsearch-reset-password -u elastic -b -s
+  register: passwd_tmp
+  when: "'-auth-' in container_name"
+
+- name: Reset elastic user password to 'secret'
+  ansible.builtin.uri:
+    url: http://localhost:9200/_security/user/elastic/_password
+    user: elastic
+    password: "{{ passwd_tmp.stdout }}"
+    method: POST
+    body:
+      password: secret
+    force_basic_auth: true
+    status_code: 200
+    body_format: json
+  changed_when: true
+  when: "'-auth-' in container_name"
