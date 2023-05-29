@@ -39,6 +39,9 @@
   register: docker_compose
   notify: Clean up docker containers and volumes
 
+- debug:
+    var: docker_compose
+
 - name: Set container_name using docker-compose output
   set_fact:
     container_name: "{{
