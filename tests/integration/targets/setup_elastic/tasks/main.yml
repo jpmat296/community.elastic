@@ -93,7 +93,7 @@
     container: "{{ container_name }}"
     command: /usr/share/elasticsearch/bin/elasticsearch-reset-password -u elastic -b -s
   register: passwd_tmp
-  when: "'-auth-' in container_name and elasticsearch_version == '8.8.0'"
+  when: "'-auth-' in container_name and elasticsearch_version is version('8.8.0', '>=')"
 
 - name: Reset elastic user password to 'secret'
   ansible.builtin.uri:
@@ -107,4 +107,4 @@
     status_code: 200
     body_format: json
   changed_when: true
-  when: "'-auth-' in container_name and elasticsearch_version == '8.8.0'"
+  when: "'-auth-' in container_name and elasticsearch_version is version('8.8.0', '>=')"
