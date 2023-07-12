@@ -114,7 +114,7 @@ def main():
         elastic = ElasticHelpers(module)
         client = elastic.connect()
 
-        current_settings = cluster_get_settings(client)
+        current_settings = cluster_get_settings(client).body
 
         if persistent:
             del current_settings['transient']
