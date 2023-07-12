@@ -22,4 +22,5 @@
   - assert:
       that:
         - "elastic.changed == False"
-        - "'Security must be explicitly enabled when using' in elastic.msg"
+        # - "'Security must be explicitly enabled when using' in elastic.msg"
+        - "'no handler found for uri [/_security/role/myrole] and method [GET]' in elastic.msg"
