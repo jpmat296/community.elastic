@@ -45,6 +45,9 @@
 
   # Last doc above in uri module task above throws an error. Find out why and fix
 
+  # FIXME REFRESH is better !!!
+  - shell: sleep 5
+
   - name: Create an index called myindex2
     community.elastic.elastic_index:
       name: myindex2

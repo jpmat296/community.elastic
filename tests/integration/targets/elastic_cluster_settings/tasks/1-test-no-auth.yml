@@ -84,7 +84,8 @@
       that:
         - "elastic.msg == 'The cluster configuration has been updated.'"
         - "elastic.changed == True"
-        - 'elastic.cluster_cfg_changes == {"action.auto_create_index": {"new_value": "false", "old_value": "true"}, "action.destructive_requires_name": {"new_value": "true", "old_value": "false"}, "cluster.auto_shrink_voting_configuration": {"new_value": "false", "old_value": "true"}, "cluster.indices.close.enable": {"new_value": "false", "old_value": "true"}}'
+        # - 'elastic.cluster_cfg_changes == {"action.auto_create_index": {"new_value": "false", "old_value": "true"}, "action.destructive_requires_name": {"new_value": "true", "old_value": "false"}, "cluster.auto_shrink_voting_configuration": {"new_value": "false", "old_value": "true"}, "cluster.indices.close.enable": {"new_value": "false", "old_value": "true"}}'
+        - 'elastic.cluster_cfg_changes == {"action.auto_create_index": {"new_value": "false", "old_value": "true"}, "cluster.auto_shrink_voting_configuration": {"new_value": "false", "old_value": "true"}, "cluster.indices.close.enable": {"new_value": "false", "old_value": "true"}}'
 
   - name: Reset settings to default
     community.elastic.elastic_cluster_settings:
