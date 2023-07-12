@@ -106,7 +106,7 @@ def put_repository(module, client, name):
     try:
         response = dict(client.snapshot.create_repository(name=name,
                                                           type=module.params['type'],
-                                                          settings={ "location": module.params['location'] },
+                                                          settings={"location": module.params['location']},
                                                           verify=module.params['verify']))
         if not isinstance(response, dict):  # Valid response should be a dict
             module.fail_json(msg="Invalid response received: {0}.".format(str(response)))
