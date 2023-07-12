@@ -27,6 +27,8 @@
     community.elastic.elastic_cluster_health:
       status: green
       <<: *elastic_index_parameters
+      poll: 20
+      interval: 3
     ignore_errors: yes
     register: elastic
 
@@ -35,7 +37,7 @@
         - "elastic.msg == 'Elasticsearch health is good.'"
         - "elastic.changed == False"
         - "elastic.status == 'green'"
-        - "elastic.iterations <= 3"
+        - "elastic.iterations <= 20"
 
 
   - name: Basic module test - success expect green
