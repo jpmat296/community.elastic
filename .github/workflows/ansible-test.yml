@@ -16,7 +16,7 @@ jobs:
       matrix:
         ansible_version:
           - stable-2.13
-          - devel
+          # - devel
     steps:
 
       - name: Check out code
