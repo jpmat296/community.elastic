@@ -16,7 +16,7 @@ jobs:
       matrix:
         ansible_version:
           - stable-2.13
-          - devel
+          # - devel
     steps:
 
       - name: Check out code
@@ -116,11 +116,13 @@ jobs:
             python_version: 3.8
           - ansible_version: stable-2.13
             python_version: 3.9
-          - ansible_version: devel
-            python_version: 3.9
+          - ansible_version: milestone
+            python_version: 3.11
         elasticsearch_version_combinations:
           - elasticsearch_version: 7.10.1
             kibana_version: 7.10.1
+          - elasticsearch_version: 8.8.2
+            kibana_version: 8.8.2
 
     steps:
 
@@ -139,7 +141,7 @@ jobs:
         with:
           timeout_minutes: 3
           max_attempts: 3
-          command: pip install docker elasticsearch==7.* requests coverage
+          command: pip install docker elasticsearch==8.* requests coverage
 
       - name: Install ansible-base (${{ matrix.ansible_version_combinations.ansible_version }})
         uses: nick-invision/retry@v2
