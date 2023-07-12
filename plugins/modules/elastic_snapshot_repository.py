@@ -91,7 +91,7 @@ def get_snapshot_repository(module, client, name):
     Uses the get snapshot api to return information about the given snapshot
     '''
     try:
-        response = dict(client.snapshot.get_repository(repository=name))
+        response = dict(client.snapshot.get_repository(name=name))
     except NotFoundError as excep:
         response = None
     except Exception as excep:
@@ -103,15 +103,10 @@ def put_repository(module, client, name):
     '''
     Creates a repository
     '''
-    body = {
-        "type": module.params['type'],
-        "settings": {
-            "location": module.params['location']
-        }
-    }
     try:
-        response = dict(client.snapshot.create_repository(repository=name,
-                                                          body=body,
+        response = dict(client.snapshot.create_repository(name=name,
+                                                          type=module.params['type'],
+                                                          settings={ "location": module.params['location'] },
                                                           verify=module.params['verify']))
         if not isinstance(response, dict):  # Valid response should be a dict
             module.fail_json(msg="Invalid response received: {0}.".format(str(response)))
@@ -174,7 +169,7 @@ def main():
                 module.exit_json(changed=False, msg="The repository {0} already exists.".format(name))
             elif state == "absent":
                 if module.check_mode is False:
-                    response = client.snapshot.delete_repository(repository=name)
+                    response = client.snapshot.delete_repository(name=name)
                 else:
                     response = {"aknowledged": True}
                 module.exit_json(changed=True, msg="The repository {0} was deleted: {1}".format(name, str(response)))
