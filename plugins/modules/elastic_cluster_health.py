@@ -35,7 +35,7 @@ options:
     type: str
     choices:
       - cluster
-      - indicies
+      - indices
       - shards
     default: cluster
   local:
