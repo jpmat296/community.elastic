@@ -91,5 +91,5 @@ class ElasticHelpers():
             module.fail_json(msg='Cannot perform {0} action on an index that does not exist'.format(method))
         else:
             class_method = getattr(client.indices, method)
-            response = class_method(name)
+            response = class_method(index=name)
             module.exit_json(changed=True, msg="The '{0}' action was performed on the index '{1}'.".format(method, name), **response)
