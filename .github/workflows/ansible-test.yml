@@ -119,8 +119,8 @@ jobs:
           # - ansible_version: devel
           #   python_version: 3.9
         elasticsearch_version_combinations:
-          - elasticsearch_version: 7.10.1
-            kibana_version: 7.10.1
+          - elasticsearch_version: 8.8.2
+            kibana_version: 8.8.2
 
     steps:
 
