@@ -45,9 +45,6 @@
 
   # Last doc above in uri module task above throws an error. Find out why and fix
 
-  # FIXME REFRESH is better !!!
-  - shell: sleep 5
-
   - name: Create an index called myindex2
     community.elastic.elastic_index:
       name: myindex2
@@ -58,6 +55,11 @@
       that:
         - result.msg == "The index 'myindex2' was created."
         - result.changed == True
+  
+  - name: Flush myindex1 to take account new documents
+    community.elastic.elastic_index:
+      <<: *elastic_index_parameters
+      name: myindex1
 
   - name: Copy documents from myindex1 to myindex2
     community.elastic.elastic_reindex:
