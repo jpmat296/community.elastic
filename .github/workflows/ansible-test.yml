@@ -116,8 +116,8 @@ jobs:
             python_version: 3.8
           - ansible_version: stable-2.13
             python_version: 3.9
-          # - ansible_version: devel
-          #   python_version: 3.9
+          - ansible_version: milestone
+            python_version: 3.11
         elasticsearch_version_combinations:
           - elasticsearch_version: 8.8.2
             kibana_version: 8.8.2
