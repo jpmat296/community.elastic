@@ -13,10 +13,12 @@ Not yet available.
 
 # Installing the latest development version
 
-At the moment please ensure you are using version 7 of the elasticsearch driver. [8+ is not currently supported](https://github.com/ansible-collections/community.elastic/issues/58).
+Both Elasticsearch 7 and 8 are supported. But version alignement between target
+Elasticesarch and elasticesearch Python library is required.
 
 ```bash
-pip install elasticsearch==7.*
+pip install elasticsearch==7.*  # To connect to Elasticsearch 7.x
+pip install elasticsearch==8.*  # To connect to Elasticsearch 8.x
 ```
 
 ```bash
