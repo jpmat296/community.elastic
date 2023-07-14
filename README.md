@@ -13,8 +13,8 @@ Not yet available.
 
 # Installing the latest development version
 
-Both Elasticsearch 7 and 8 are supported. But version alignement between target
-Elasticesarch and elasticesearch Python library is required.
+Both Elasticsearch server version 7 and 8 are supported. But the version
+of elasticesearch Python library must be aligned with Elasticsearch server.
 
 ```bash
 pip install elasticsearch==7.*  # To connect to Elasticsearch 7.x
