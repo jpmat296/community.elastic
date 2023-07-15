@@ -114,7 +114,9 @@ def main():
         elastic = ElasticHelpers(module)
         client = elastic.connect()
 
-        current_settings = cluster_get_settings(client).body
+        current_settings = cluster_get_settings(client)
+        if hasattr(current_settings, 'body'):  # Required for Elasticsearch 8.x
+            current_settings = current_settings.body
 
         if persistent:
             del current_settings['transient']
