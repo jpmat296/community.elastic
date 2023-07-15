@@ -8,11 +8,13 @@ elastic_found = False
 E_IMP_ERR = None
 NotFoundError = None
 helpers = None
+__version__ = None
 
 try:
     from elasticsearch import Elasticsearch
     from elasticsearch.exceptions import NotFoundError  # pylint: disable=unused-import
     from elasticsearch import helpers  # pylint: disable=unused-import
+    from elasticsearch import __version__   # pylint: disable=unused-import
     elastic_found = True
 except ImportError:
     E_IMP_ERR = traceback.format_exc()
