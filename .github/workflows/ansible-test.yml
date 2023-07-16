@@ -147,6 +147,9 @@ jobs:
           - elasticsearch_version: 7.10.1
             kibana_version: 7.10.1
             elasticsearch_python_lib: elasticsearch==7.*
+          - elasticsearch_version: 8.0.1
+            kibana_version: 8.0.1
+            elasticsearch_python_lib: elasticsearch==8.*
           - elasticsearch_version: 8.8.2
             kibana_version: 8.8.2
             elasticsearch_python_lib: elasticsearch==8.*
