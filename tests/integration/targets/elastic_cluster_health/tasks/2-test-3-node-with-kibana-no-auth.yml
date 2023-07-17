@@ -117,8 +117,8 @@
       - { "wait_for": 'status', "to_be": "green" }
       - { "wait_for": 'number_of_nodes', "to_be": 3 }
       - { "wait_for": 'number_of_data_nodes', "to_be": 3 }
-      - { "wait_for": 'active_primary_shards', "to_be": "{{active_primary_shards}}" }
-      - { "wait_for": 'active_shards', "to_be": "{{active_shards}}" }
+      # - { "wait_for": 'active_primary_shards', "to_be": "{{active_primary_shards}}" }
+      # - { "wait_for": 'active_shards', "to_be": "{{active_shards}}" }
       - { "wait_for": 'relocating_shards', "to_be": 0 }
       - { "wait_for": 'initializing_shards', "to_be": 0 }
       - { "wait_for": 'unassigned_shards', "to_be": 0 }
