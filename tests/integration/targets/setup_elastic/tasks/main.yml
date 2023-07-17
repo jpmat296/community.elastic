@@ -36,32 +36,32 @@
   environment:
     ELASTICSEARCH_VERSION: "{{ elasticsearch_version }}"
     KIBANA_VERSION: "{{ kibana_version }}"
-  register: docker_compose
+  # register: docker_compose
   notify: Clean up docker containers and volumes
 
-- debug:
-    var: docker_compose
+# - debug:
+#     var: docker_compose
 
-# TODO: container_name should be find with Ansible loop
-# MSG1: Creating single-node-01 ... done
-- name: Set container_name using docker-compose output
-  set_fact:
-    container_name: "{{
-      (
-        docker_compose.stderr_lines | select('search', 'Creating') | select('search', 'done') | list
-      )[0].split()[1]
-      }}"
-  ignore_errors: yes
+# # TODO: container_name should be find with Ansible loop
+# # MSG1: Creating single-node-01 ... done
+# - name: Set container_name using docker-compose output
+#   set_fact:
+#     container_name: "{{
+#       (
+#         docker_compose.stderr_lines | select('search', 'Creating') | select('search', 'done') | list
+#       )[0].split()[1]
+#       }}"
+#   ignore_errors: yes
 
-# MSG2: Container single-node-01  Created
-- name: Set container_name using docker-compose output
-  set_fact:
-    container_name: "{{
-      (
-        docker_compose.stderr_lines | select('search', 'Created') | select('search', 'Container') | list
-      )[0].split()[1]
-      }}"
-  when: container_name is not defined
+# # MSG2: Container single-node-01  Created
+# - name: Set container_name using docker-compose output
+#   set_fact:
+#     container_name: "{{
+#       (
+#         docker_compose.stderr_lines | select('search', 'Created') | select('search', 'Container') | list
+#       )[0].split()[1]
+#       }}"
+#   when: container_name is not defined
 
 - name: Set elastic_ports to 9200 when using a single node
   set_fact:
@@ -88,23 +88,23 @@
   retries: 30 # retry X times
   delay: 3 # pause for X sec b/w each call
 
-- name: Reset elastic user password to temporary value
-  community.docker.docker_container_exec:
-    container: "{{ container_name }}"
-    command: /usr/share/elasticsearch/bin/elasticsearch-reset-password -u elastic -b -s
-  register: passwd_tmp
-  when: "'-auth-' in container_name and elasticsearch_version is version('8.8.0', '>=')"
+# - name: Reset elastic user password to temporary value
+#   community.docker.docker_container_exec:
+#     container: "{{ container_name }}"
+#     command: /usr/share/elasticsearch/bin/elasticsearch-reset-password -u elastic -b -s
+#   register: passwd_tmp
+#   when: "'-auth-' in container_name and elasticsearch_version is version('8.8.0', '>=')"
 
-- name: Reset elastic user password to 'secret'
-  ansible.builtin.uri:
-    url: http://localhost:9200/_security/user/elastic/_password
-    user: elastic
-    password: "{{ passwd_tmp.stdout }}"
-    method: POST
-    body:
-      password: secret
-    force_basic_auth: true
-    status_code: 200
-    body_format: json
-  changed_when: true
-  when: "'-auth-' in container_name and elasticsearch_version is version('8.8.0', '>=')"
+# - name: Reset elastic user password to 'secret'
+#   ansible.builtin.uri:
+#     url: http://localhost:9200/_security/user/elastic/_password
+#     user: elastic
+#     password: "{{ passwd_tmp.stdout }}"
+#     method: POST
+#     body:
+#       password: secret
+#     force_basic_auth: true
+#     status_code: 200
+#     body_format: json
+#   changed_when: true
+#   when: "'-auth-' in container_name and elasticsearch_version is version('8.8.0', '>=')"
