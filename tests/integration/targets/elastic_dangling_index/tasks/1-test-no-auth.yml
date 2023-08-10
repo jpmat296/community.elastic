@@ -1,0 +1,91 @@
+---
+- vars:
+    myindex_index_uuid: FHeMajbLR1CF6NLtm6XcfA
+    myindex2_index_uuid: 2pXWJQGlQJSqRYwSzjVpaA
+    container_name: single-node-01
+    path_indices: >
+      "{{'/usr/share/elasticsearch/data/indices/' if elasticsearch_version is version('8.0.0', '>=')
+      else '/usr/share/elasticsearch/data/nodes/0/indices/'}}"
+    elastic_index_parameters: &elastic_index_parameters
+      timeout: 30
+
+  block:
+
+  - name: Create dangling index - Prepare indices directory
+    ansible.builtin.shell: |
+      docker exec {{ container_name }} mkdir -p {{ path_indices }}
+      docker exec {{ container_name }} chmod 0775 {{ path_indices }}
+
+  - name: Create dangling index - Copy dangling index files (before delete)
+    ansible.builtin.shell: |
+      cat {{ role_path }}/files/myindex-{{ myindex_index_uuid }}.tar | docker cp - {{ container_name }}:{{ path_indices }}
+
+  - name: Delete dangling index
+    community.elastic.elastic_dangling_index:
+      uuid: "{{ myindex_index_uuid }}"
+      state: absent
+      <<: *elastic_index_parameters
+    register: result
+
+  - assert:
+      that:
+        - result.changed == True
+        - result.msg == "The index with uuid '{{ myindex_index_uuid }}' was deleted from dangling indices."
+
+  - name: Check there is no more any dangling index
+    community.elastic.elastic_dangling_index_list:
+      <<: *elastic_index_parameters
+    register: result
+
+  - assert:
+      that:
+        - "result.dangling_indices | length == 0"
+
+  - name: Check myindex has *not* been imported
+    community.elastic.elastic_index:
+      name: myindex
+      state: absent
+      <<: *elastic_index_parameters
+    register: result
+
+  - assert:
+      that:
+        - result.msg == "The index 'myindex' does not exist."
+        - result.changed == False
+
+  - name: Create dangling index - Copy dangling index files (before import)
+    ansible.builtin.shell: |
+      cat {{ role_path }}/files/myindex2-{{ myindex2_index_uuid }}.tar | docker cp - {{ container_name }}:{{ path_indices }}
+
+  - name: Import dangling index
+    community.elastic.elastic_dangling_index:
+      uuid: "{{ myindex2_index_uuid }}"
+      state: imported
+      <<: *elastic_index_parameters
+    register: result
+
+  - assert:
+      that:
+        - result.changed == True
+        - result.msg == "The index with uuid '{{ myindex2_index_uuid }}' was imported."
+
+  - name: Check there is no more any dangling index
+    community.elastic.elastic_dangling_index_list:
+      <<: *elastic_index_parameters
+    register: result
+
+  - assert:
+      that:
+        - "result.dangling_indices | length == 0"
+
+  - name: Check myindex2 has been imported
+    community.elastic.elastic_index:
+      name: myindex2
+      state: present
+      <<: *elastic_index_parameters
+    register: result
+
+  - assert:
+      that:
+        - result.msg == "The index 'myindex2' already exists."
+        - result.changed == False

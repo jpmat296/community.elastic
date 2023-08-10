@@ -1,0 +1,39 @@
+---
+- vars:
+    myindex_index_uuid: FHeMajbLR1CF6NLtm6XcfA
+    container_name: single-node-01
+    path_indices: >
+      "{{'/usr/share/elasticsearch/data/indices/' if elasticsearch_version is version('8.0.0', '>=')
+      else '/usr/share/elasticsearch/data/nodes/0/indices/'}}"
+    elastic_index_parameters: &elastic_index_parameters
+      timeout: 30
+
+  block:
+
+  - name: Get list of dangling indices on new installation
+    community.elastic.elastic_dangling_index_list:
+      <<: *elastic_index_parameters
+    register: result
+
+  - assert:
+      that:
+        - "result.dangling_indices | length == 0"
+
+  - name: Create dangling index - Prepare indices directory
+    ansible.builtin.command: >
+      docker exec {{ container_name }} mkdir -p {{ path_indices }}
+
+  - name: Create dangling index - Copy dangling index files
+    ansible.builtin.shell: |
+      cat {{ role_path }}/files/myindex-{{ myindex_index_uuid }}.tar | docker cp - {{ container_name }}:{{ path_indices }}
+
+  - name: Get list of dangling indices with one dangling index
+    community.elastic.elastic_dangling_index_list:
+      <<: *elastic_index_parameters
+    register: result
+
+  - assert:
+      that:
+        - "result.dangling_indices | length == 1"
+        - "result.dangling_indices[0].index_name == 'myindex'"
+        - "result.dangling_indices[0].index_uuid == myindex_index_uuid"
