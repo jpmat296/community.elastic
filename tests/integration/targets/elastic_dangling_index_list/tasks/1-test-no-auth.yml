@@ -24,8 +24,8 @@
       docker exec {{ container_name }} mkdir -p {{ path_indices }}
 
   - name: Create dangling index - Copy dangling index files
-    ansible.builtin.command: >
-      docker cp {{ role_path }}/files/{{ myindex_index_uuid }} {{ container_name }}:{{ path_indices }}
+    ansible.builtin.shell: >
+      cat {{ role_path }}/files/myindex-{{ myindex_index_uuid }}.tar | docker cp - {{ container_name }}:{{ path_indices }}
 
   - name: Get list of dangling indices with one dangling index
     community.elastic.elastic_dangling_index_list:
