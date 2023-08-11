@@ -25,9 +25,7 @@
 
   - name: Create dangling index - Copy dangling index files
     ansible.builtin.shell: |
-      cat {{ role_path }}/files/myindex-{{ myindex_index_uuid }}.tar | docker cp - {{ container_name }}:/tmp
-      docker exec {{ container_name }} chown -R elasticsearch:root /tmp/{{ myindex_index_uuid }}
-      docker exec {{ container_name }} cp -rp /tmp/{{ myindex_index_uuid }} {{ path_indices }}
+      cat {{ role_path }}/files/myindex-{{ myindex_index_uuid }}.tar | docker cp - {{ container_name }}:{{ path_indices }}
 
   - name: Get list of dangling indices with one dangling index
     community.elastic.elastic_dangling_index_list:

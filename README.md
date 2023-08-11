@@ -46,6 +46,7 @@ These modules are tested on Debian and RHEL based distributions.
 - `elastic_transform`: Manage Elasticsearch Transform Jobs.
 - `elastic_user`: Manage Elasticsearch users.
 - `elastic_dangling_index_list`: List Elasticsearch dandling indexes.
+- `elastic_dangling_index`: Manage Elasticsearch dandling indexes.
 
 ## Running the integration tests
 
