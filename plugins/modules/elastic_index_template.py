@@ -87,7 +87,7 @@ def put_index_template(module, client, name):
     try:
         with open(module.params['src']) as f:
             body = json.loads(f.read())
-        response = dict(client.indices.put_index_template(name=name, **body))
+        response = dict(client.indices.put_index_template(name=name, body=body))
         if not isinstance(response, dict):  # Valid response should be a dict
             module.fail_json(msg="Invalid response received: {0}.".format(str(response)))
     except Exception as excep:
