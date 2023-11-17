@@ -132,9 +132,7 @@ jobs:
         working-directory: ansible_collections/community/elastic
     strategy:
       matrix:
-        elastic_module:
-         - elastic_index_template
-#        elastic_module: ${{ fromJson(needs.integration_matrix.outputs.matrix) }}
+        elastic_module: ${{ fromJson(needs.integration_matrix.outputs.matrix) }}
         ansible_version_combinations:
           - ansible_version: stable-2.13
             python_version: "3.9"
