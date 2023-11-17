@@ -19,7 +19,7 @@
   - assert:
       that:
         - "elastic.changed"
-        - "'The index template mytemplate was successfully created' in elastic.msg"
+        - "'The index_template mytemplate was successfully created' in elastic.msg"
 
   - name: Recreate same index template - no change
     community.elastic.elastic_index_template:
@@ -32,7 +32,7 @@
 - assert:
     that:
       - "elastic.changed == False"
-      - "elastic.msg == 'The index template mytemplate already exists as configured.'"
+      - "elastic.msg == 'The index_template mytemplate already exists as configured.'"
 
 - name: Update the index template
   community.elastic.elastic_index_template:
@@ -45,7 +45,7 @@
 - assert:
     that:
       - "elastic.changed"
-      - "'The index template mytemplate was successfully updated' in elastic.msg"
+      - "'The index_template mytemplate was successfully updated' in elastic.msg"
 
 - name: Delete the index template
   community.elastic.elastic_index_template:
@@ -57,249 +57,86 @@
 - assert:
     that:
       - "elastic.changed"
-      - elastic.msg == 'The index template mytemplate was deleted.'
+      - elastic.msg == 'The index_template mytemplate was deleted.'
 
-# - name: Add a new index template with check mode
-#   community.elastic.elastic_index_template:
-#     name: mytemplate
-#     state: present
-#     src:  "{{ role_path }}/files/mytemplate.json"
-#     <<: *elastic_index_parameters
-#   register: elastic
-#   check_mode: yes
+- name: Add a new index template with check mode
+  community.elastic.elastic_index_template:
+    name: mytemplate
+    state: present
+    src:  "{{ role_path }}/files/mytemplate.json"
+    <<: *elastic_index_parameters
+  register: elastic
+  check_mode: yes
 
-# - assert:
-#     that:
-#       - "elastic.changed"
-#       - "'The index template mytemplate was successfully created' in elastic.msg"
+- assert:
+    that:
+      - "elastic.changed"
+      - "'The index_template mytemplate was successfully created' in elastic.msg"
 
-# - name: Add new index template
-#   community.elastic.elastic_index_template:
-#     name: mytemplate
-#     state: present
-#     src:  "{{ role_path }}/files/mytemplate_v2.json"
-#     <<: *elastic_index_parameters
-#   register: elastic
-#   check_mode: no
+- name: Add new index template
+  community.elastic.elastic_index_template:
+    name: mytemplate
+    state: present
+    src:  "{{ role_path }}/files/mytemplate.json"
+    <<: *elastic_index_parameters
+  register: elastic
+  check_mode: no
 
-# - assert:
-#     that:
-#       - "elastic.changed"
-#       - "'The index template mytemplate was successfully created' in elastic.msg"
+- assert:
+    that:
+      - "elastic.changed"
+      - "'The index_template mytemplate was successfully created' in elastic.msg"
 
-# - name: Modify index template check mode
-#   community.elastic.elastic_index_template:
-#     name: mytemplate
-#     state: present
-#     indices:
-#       - names:
-#           - "index1"
-#           - "index2"
-#           - "index3"
-#         privileges:
-#           - "all"
-#     <<: *elastic_index_parameters
-#   register: elastic
-#   check_mode: yes
+- name: Modify index template check mode
+  community.elastic.elastic_index_template:
+    name: mytemplate
+    state: present
+    src:  "{{ role_path }}/files/mytemplate_v2.json"
+    <<: *elastic_index_parameters
+  register: elastic
+  check_mode: yes
 
-# - assert:
-#     that:
-#       - "elastic.changed"
-#       - "'The index template mytemplate was successfully updated' in elastic.msg"
+- assert:
+    that:
+      - "elastic.changed"
+      - "'The index_template mytemplate was successfully updated' in elastic.msg"
 
-# - name: Modify index template
-#   community.elastic.elastic_index_template:
-#     name: mytemplate
-#     state: present
-#     indices:
-#       - names:
-#           - "index1"
-#           - "index2"
-#           - "index3"
-#         privileges:
-#           - "all"
-#     <<: *elastic_index_parameters
-#   register: elastic
-#   check_mode: no
+- name: Modify index template
+  community.elastic.elastic_index_template:
+    name: mytemplate
+    state: present
+    src:  "{{ role_path }}/files/mytemplate_v2.json"
+    <<: *elastic_index_parameters
+  register: elastic
+  check_mode: no
 
-# - assert:
-#     that:
-#       - "elastic.changed"
-#       - "'The index template mytemplate was successfully updated' in elastic.msg"
+- assert:
+    that:
+      - "elastic.changed"
+      - "'The index_template mytemplate was successfully updated' in elastic.msg"
 
-# - name: Delete index template check mode
-#   community.elastic.elastic_index_template:
-#     name: mytemplate
-#     state: absent
-#     <<: *elastic_index_parameters
-#   register: elastic
-#   check_mode: yes
+- name: Delete index template check mode
+  community.elastic.elastic_index_template:
+    name: mytemplate
+    state: absent
+    <<: *elastic_index_parameters
+  register: elastic
+  check_mode: yes
 
-# - assert:
-#     that:
-#       - "elastic.changed"
-#       - "elastic.msg == 'The index template mytemplate was deleted.'"
+- assert:
+    that:
+      - "elastic.changed"
+      - "elastic.msg == 'The index_template mytemplate was deleted.'"
 
-# - name: Delete index template
-#   community.elastic.elastic_index_template:
-#     name: mytemplate
-#     state: absent
-#     <<: *elastic_index_parameters
-#   register: elastic
-#   check_mode: no
+- name: Delete index template
+  community.elastic.elastic_index_template:
+    name: mytemplate
+    state: absent
+    <<: *elastic_index_parameters
+  register: elastic
+  check_mode: no
 
-# - assert:
-#     that:
-#       - "elastic.changed"
-#       - "elastic.msg == 'The index template mytemplate was deleted.'"
-
-# - name: Create a index template with cluster privs
-#   community.elastic.elastic_index_template:
-#     name: snapshot
-#     state: present
-#     cluster:
-#       - create_snapshot
-#       - monitor_snapshot
-#       - manage_slm
-#     <<: *elastic_index_parameters
-#   register: elastic
-
-# - assert:
-#     that:
-#       - "elastic.changed"
-#       - "'The index template snapshot was successfully created' in elastic.msg"
-
-# - name: Create a index template with cluster privs
-#   community.elastic.elastic_index_template:
-#     name: snapshot
-#     state: present
-#     cluster:
-#       - create_snapshot
-#       - monitor_snapshot
-#       - manage_slm
-#     <<: *elastic_index_parameters
-#   register: elastic
-
-# - assert:
-#     that:
-#       - "elastic.changed == False"
-#       - "'The index template snapshot already exists as configured.' in elastic.msg"
-
-# - name: Create a index template with all cluster privs
-#   community.elastic.elastic_index_template:
-#     name: root
-#     state: present
-#     cluster:
-#       - all
-#     <<: *elastic_index_parameters
-#   register: elastic
-
-# - assert:
-#     that:
-#       - "elastic.changed"
-#       - "'The index template root was successfully created' in elastic.msg"
-
-# - name: Create a index template with all cluster privs
-#   community.elastic.elastic_index_template:
-#     name: root
-#     state: present
-#     cluster:
-#       - all
-#     <<: *elastic_index_parameters
-#   register: elastic
-
-# - assert:
-#     that:
-#       - "elastic.changed == False"
-#       - "'The index template root already exists as configured.' in elastic.msg"
-
-# - name: Add an application to a index template
-#   community.elastic.elastic_index_template:
-#     name: root
-#     state: present
-#     cluster:
-#       - all
-#     applications:
-#       - application: myapp
-#         privileges:
-#           - admin
-#           - read
-#         resources:
-#           - "*"
-#     <<: *elastic_index_parameters
-#   register: elastic
-
-# - assert:
-#     that:
-#       - "elastic.changed"
-#       - "'The index template root was successfully updated' in elastic.msg"
-
-# - name: Create a index template called admin
-#   community.elastic.elastic_index_template:
-#     name: admin
-#     cluster:
-#       - all
-#     indices:
-#       - names:
-#           - index1
-#           - index2
-#           - index3
-#         privileges:
-#           - all
-#     applications:
-#       - application: myapp1
-#         privileges:
-#           - admin
-#           - read
-#         resources: "*"
-#       - application: myapp2
-#         privileges:
-#           - admin
-#         resources: "*"
-#     run_as:
-#       - other_user
-#       - reporting_user
-#     metadata:
-#       comment: "System admin index template"
-#     <<: *elastic_index_parameters
-#   register: elastic
-
-# - assert:
-#     that:
-#       - "elastic.changed"
-#       - "'The index template admin was successfully created' in elastic.msg"
-
-# - name: Create a index template called admin - run again, no change
-#   community.elastic.elastic_index_template:
-#     name: admin
-#     cluster:
-#       - all
-#     indices:
-#       - names:
-#           - index1
-#           - index2
-#           - index3
-#         privileges:
-#           - all
-#     applications:
-#       - application: myapp1
-#         privileges:
-#           - admin
-#           - read
-#         resources: "*"
-#       - application: myapp2
-#         privileges:
-#           - admin
-#         resources: "*"
-#     run_as:
-#       - other_user
-#       - reporting_user
-#     metadata:
-#       comment: "System admin index template"
-#     <<: *elastic_index_parameters
-#   register: elastic
-
-# - assert:
-#     that:
-#       - "elastic.changed == False"
-#       - "'The index template admin already exists as configured.' in elastic.msg"
+- assert:
+    that:
+      - "elastic.changed"
+      - "elastic.msg == 'The index_template mytemplate was deleted.'"
