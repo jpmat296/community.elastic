@@ -5,7 +5,7 @@
 
   block:
 
-  - name: Attempt ot create a index template when auth is not enabled
+  - name: Create an index template when auth is not enabled
     community.elastic.elastic_index_template:
       name: mytemplate
       state: present
@@ -16,10 +16,8 @@
 
   - assert:
       that:
-        - "elastic.changed == False"
+        - "elastic.changed == True"
         - "'{{es_msg}}' in elastic.msg"
     vars:
       es_msg:
-        "{{'no handler found for uri [/_security/index template/myindex template] and method [GET]'
-           if elasticsearch_version is version('8.0.0', '>=')
-           else 'Invalid index name [_security]'}}"
+        "The index_template mytemplate was successfully created"

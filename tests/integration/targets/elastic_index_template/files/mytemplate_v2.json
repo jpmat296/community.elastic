@@ -1,14 +1,40 @@
 {
+    "index_patterns": [
+        "te*",
+        "bar*"
+    ],
     "template": {
+        "settings": {
+            "number_of_shards": 1
+        },
         "mappings": {
+            "_source": {
+                "enabled": true
+            },
             "properties": {
-                "@timestamp": {
-                    "type": "date"
+                "host_name": {
+                    "type": "keyword"
+                },
+                "created_at": {
+                    "type": "date",
+                    "format": "EEE MMM dd HH:mm:ss Z yyyy"
                 },
                 "myinteger": {
                     "type": "integer"
                 }
             }
+        },
+        "aliases": {
+            "mydata": {}
         }
+    },
+    "priority": 500,
+    "composed_of": [
+        "component_template1",
+        "runtime_component_template"
+    ],
+    "version": 3,
+    "_meta": {
+        "description": "my custom"
     }
 }
