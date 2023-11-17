@@ -28,9 +28,9 @@ jobs:
           # Add new versions announced in
           # https://github.com/ansible-collections/news-for-maintainers in a timely manner,
           # consider dropping testing against EOL versions and versions you don't support.
-          # - stable-2.13
-          # - stable-2.14
-          # - stable-2.15
+          - stable-2.13
+          - stable-2.14
+          - stable-2.15
           - stable-2.16
         # - devel
           - milestone
@@ -136,16 +136,16 @@ jobs:
          - elastic_index_template
 #        elastic_module: ${{ fromJson(needs.integration_matrix.outputs.matrix) }}
         ansible_version_combinations:
-          # - ansible_version: stable-2.13
-          #   python_version: "3.9"
-          # - ansible_version: stable-2.14
-          #   python_version: "3.10"
-          # - ansible_version: stable-2.15
-          #   python_version: "3.10"
+          - ansible_version: stable-2.13
+            python_version: "3.9"
+          - ansible_version: stable-2.14
+            python_version: "3.10"
+          - ansible_version: stable-2.15
+            python_version: "3.10"
           - ansible_version: stable-2.16
             python_version: "3.11"
-          # - ansible_version: milestone
-          #   python_version: "3.11"
+          - ansible_version: milestone
+            python_version: "3.11"
         elasticsearch_version_combinations:
           - elasticsearch_version: 7.10.1
             kibana_version: 7.10.1
