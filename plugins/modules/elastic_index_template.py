@@ -87,7 +87,7 @@ def put_index_template(module, client, name):
     try:
         with open(module.params['src']) as f:
             body = json.loads(f.read())
-        response = dict(client.indices.put_index_template(name=name, template=body['template'], index_patterns=body['index_patterns']))
+        response = dict(client.indices.put_index_template(name=name, **body))
         if not isinstance(response, dict):  # Valid response should be a dict
             module.fail_json(msg="Invalid response received: {0}.".format(str(response)))
     except Exception as excep:
@@ -99,27 +99,12 @@ def index_template_is_different(index_template, module):
     '''
     Check if there are any differences in the index template
     '''
-    return True
-    # dict1 = json.dumps(module.params['applications'], sort_keys=True)
-    # dict2 = json.dumps(index_template.get('applications', {}), sort_keys=True)
-    # if dict1 is not None and dict1 != dict2:
-    #     return True
-    # if len(list(set(module.params['cluster']) - set(index_template.get('cluster', set())))) > 0:
-    #     return True
-    # dict1 = json.dumps(module.params['global_v'], sort_keys=True)
-    # dict2 = json.dumps(index_template.get('global', None), sort_keys=True)
-    # if dict1 is not None and dict1 != dict2:
-    #     return True
-    # dict1 = json.dumps(module.params['indices'], sort_keys=True)
-    # dict2 = json.dumps(index_template.get('indices', None), sort_keys=True)
-    # if dict1 is not None and dict1 != dict2:
-    #     return True
-    # dict1 = json.dumps(module.params['metadata'], sort_keys=True)
-    # dict2 = json.dumps(index_template.get('metadata', None), sort_keys=True)
-    # if dict1 is not None and dict1 != dict2:
-    #     return True
-    # if len(list(set(module.params['run_as']) - set(index_template.get('run_as', set())))) > 0:
-    #     return True
+    with open(module.params['src']) as f:
+        body = json.loads(f.read())
+    dict1 = json.dumps(body, sort_keys=True)
+    dict2 = json.dumps(index_template, sort_keys=True)
+    if dict1 is not None and dict1 != dict2:
+        return True
 
 
 # ================
@@ -169,7 +154,7 @@ def main():
                 module.exit_json(changed=False, msg="The index_template {0} does not exist.".format(name))
         else:
             if state == "present":
-                if index_template_is_different(index_template, module):
+                if index_template_is_different(index_template['index_templates'][0]['index_template'], module):
                     if module.check_mode is False:
                         response = put_index_template(module, client, name)
                     module.exit_json(changed=True, msg="The index_template {0} was successfully updated: {1}".format(name, str(response)))

@@ -16,7 +16,7 @@
 
   - assert:
       that:
-        - "elastic.changed == True"
+        - "elastic.changed"
         - "'{{es_msg}}' in elastic.msg"
     vars:
       es_msg:
