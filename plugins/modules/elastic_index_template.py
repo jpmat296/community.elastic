@@ -55,7 +55,7 @@ RETURN = r'''
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
-
+import json
 
 from ansible_collections.community.elastic.plugins.module_utils.elastic_common import (
     missing_required_lib,
@@ -86,7 +86,7 @@ def put_index_template(module, client, name):
     '''
     try:
         with open(module.params['src']) as f:
-            body = f.read()
+            body = json.loads(f.read())
         response = dict(client.indices.put_index_template(name=name, template=body))
         if not isinstance(response, dict):  # Valid response should be a dict
             module.fail_json(msg="Invalid response received: {0}.".format(str(response)))
