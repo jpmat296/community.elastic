@@ -1,0 +1,14 @@
+{
+    "template": {
+        "mappings": {
+            "properties": {
+                "@timestamp": {
+                    "type": "date"
+                },
+                "myinteger": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
+}
