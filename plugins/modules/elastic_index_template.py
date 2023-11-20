@@ -66,6 +66,9 @@ from ansible_collections.community.elastic.plugins.module_utils.elastic_common i
     NotFoundError
 )
 
+def index_template_from_file(src):
+    with open(src) as f:
+        return json.loads(f.read())
 
 def get_index_template(module, client, name):
     '''
@@ -85,8 +88,7 @@ def put_index_template(module, client, name):
     Creates or updates an index template
     '''
     try:
-        with open(module.params['src']) as f:
-            body = json.loads(f.read())
+        body = index_template_from_file(module.params['src'])
         response = dict(client.indices.put_index_template(name=name, body=body))
         if not isinstance(response, dict):  # Valid response should be a dict
             module.fail_json(msg="Invalid response received: {0}.".format(str(response)))
@@ -99,8 +101,7 @@ def index_template_is_different(index_template, module):
     '''
     Check if there are any differences in the index template
     '''
-    with open(module.params['src']) as f:
-        body = json.loads(f.read())
+    body = index_template_from_file(module.params['src'])
     dict1 = json.dumps(body, sort_keys=True)
     dict2 = json.dumps(index_template, sort_keys=True)
     if dict1 is not None and dict1 != dict2:
@@ -142,22 +143,33 @@ def main():
         elastic = ElasticHelpers(module)
         client = elastic.connect()
 
-        index_template = get_index_template(module, client, name)
+        if (before := get_index_template(module, client, name)) is not None:
+            before = before['index_templates'][0]['index_template']
         response = None
 
-        if index_template is None:
+        if before is None:
             if state == "present":
                 if module.check_mode is False:
                     response = put_index_template(module, client, name)
-                module.exit_json(changed=True, msg="The index_template {0} was successfully created: {1}".format(name, str(response)))
+                exit_json = {
+                    "changed": True,
+                    "msg": "The index_template {0} was successfully created: {1}".format(name, str(response)),
+                }
+                exit_json |= { "diff": {"after": index_template_from_file(module.params['src'])}} if module._diff else {}
+                module.exit_json(**exit_json)
             elif state == "absent":
                 module.exit_json(changed=False, msg="The index_template {0} does not exist.".format(name))
         else:
             if state == "present":
-                if index_template_is_different(index_template['index_templates'][0]['index_template'], module):
+                if index_template_is_different(before, module):
                     if module.check_mode is False:
                         response = put_index_template(module, client, name)
-                    module.exit_json(changed=True, msg="The index_template {0} was successfully updated: {1}".format(name, str(response)))
+                    exit_json = {
+                        "changed": True,
+                        "msg": "The index_template {0} was successfully updated: {1}".format(name, str(response)),
+                    }
+                    exit_json |= { "diff": {"before": before, "after": index_template_from_file(module.params['src'])}} if module._diff else {}
+                    module.exit_json(**exit_json)
                 else:
                     module.exit_json(changed=False, msg="The index_template {0} already exists as configured.".format(name))
             elif state == "absent":
