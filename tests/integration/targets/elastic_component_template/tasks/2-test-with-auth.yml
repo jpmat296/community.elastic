@@ -1,0 +1,69 @@
+---
+- vars:
+    elastic_index_parameters: &elastic_index_parameters
+      login_user: elastic
+      login_password: secret
+      auth_method: http_auth
+      timeout: 30
+
+  block:
+
+  - name: Create a component template
+    community.elastic.elastic_component_template:
+      name: 02_shards
+      src: "{{ role_path }}/files/02_shards.json"
+      <<: *elastic_index_parameters
+    register: elastic
+
+  - assert:
+      that:
+        - "elastic.changed == True"
+        - "'The component template 02_shards was successfully created' in elastic.msg"
+
+  - name: Create component template again - should be updated
+    community.elastic.elastic_component_template:
+      name: 02_shards
+      src: "{{ role_path }}/files/02_shards_1rep.json"
+      <<: *elastic_index_parameters
+    register: elastic
+
+  - assert:
+      that:
+        - "elastic.changed == True"
+        - "'The component template 02_shards was successfully updated' in elastic.msg"
+
+  - name: Create compnent template again - should NOT be updated
+    community.elastic.elastic_component_template:
+      name: 02_shards
+      src: "{{ role_path }}/files/02_shards_1rep.json"
+      <<: *elastic_index_parameters
+    register: elastic
+
+  - assert:
+      that:
+        - "elastic.changed == False"
+        - "elastic.msg == 'The component template 02_shards already exists as configured.'"
+
+  - name: Delete component template
+    community.elastic.elastic_component_template:
+      name: 02_shards
+      state: absent
+      <<: *elastic_index_parameters
+    register: elastic
+
+  - assert:
+      that:
+        - "elastic.changed == True"
+        - "elastic.msg == 'The component template 02_shards was deleted.'"
+
+  - name: Delete component template again
+    community.elastic.elastic_component_template:
+      name: 02_shards
+      state: absent
+      <<: *elastic_index_parameters
+    register: elastic
+
+  - assert:
+      that:
+        - "elastic.changed == False"
+        - "elastic.msg == 'The component template 02_shards does not exist.'"
