@@ -71,9 +71,11 @@ from ansible_collections.community.elastic.plugins.module_utils.elastic_common i
     NotFoundError
 )
 
+
 def component_template_from_file(src):
     with open(src) as f:
         return json.loads(f.read())
+
 
 def get_component_template(module, client, name):
     '''
