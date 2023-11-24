@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2023, Jean-Pierre Matsumoto <jpmat296@googlemail.com>
+# Copyright: (c) 2023, Jean-Pierre Matsumoto (@jpmat296) <jpmat296@googlemail.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
@@ -17,7 +17,7 @@ description:
   - Manage Elasticsearch component templates.
 
 author: Jean-Pierre Matsumoto (@jpmat296)
-version_added: "0.0.2"
+version_added: "1.2.0"
 
 extends_documentation_fragment:
   - community.elastic.login_options
@@ -30,7 +30,7 @@ options:
     required: yes
   src:
     description:
-      - Path to JSON file containing the component template
+      - Path to JSON file containing component template body.
       - value is required when C(state) is C(present)
     type: str
   state:
@@ -57,6 +57,7 @@ EXAMPLES = r'''
 
 RETURN = r'''
 '''
+
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
 import json
@@ -70,6 +71,9 @@ from ansible_collections.community.elastic.plugins.module_utils.elastic_common i
     NotFoundError
 )
 
+def component_template_from_file(src):
+    with open(src) as f:
+        return json.loads(f.read())
 
 def get_component_template(module, client, name):
     '''
@@ -89,15 +93,9 @@ def put_component_template(module, client, name):
     '''
     Creates or updates a component template using a JSON file as component template content.
     '''
-    keys = [
-        "src"
-    ]
-
-    with open(module.params['src']) as json_file:
-        data = json.load(json_file)
-
     try:
-        response = dict(client.cluster.put_component_template(name=name, body=data))
+        body = component_template_from_file(module.params['src'])
+        response = dict(client.cluster.put_component_template(name=name, body=body))
         if not isinstance(response, dict):  # Valid response should be a dict
             module.fail_json(msg="Invalid response received: {0}.".format(str(response)))
     except Exception as excep:
@@ -109,10 +107,8 @@ def component_template_is_different(current_ct, module):
     '''
     Check if component template is different
     '''
-    with open(module.params['src']) as json_file:
-        disk_ct = json.load(json_file)
     str1 = json.dumps(current_ct, sort_keys=True)
-    str2 = json.dumps(disk_ct, sort_keys=True)
+    str2 = json.dumps(component_template_from_file(module.params['src']), sort_keys=True)
     return str1 != str2
 
 
@@ -130,8 +126,8 @@ def main():
     argument_spec = elastic_common_argument_spec()
     argument_spec.update(
         name=dict(type='str', required=True),
-        src=dict(type='str'),
-        state=dict(type='str', choices=state_choices, default='present')
+        state=dict(type='str', choices=state_choices, default='present'),
+        src=dict(type='str', required=False),
     )
 
     module = AnsibleModule(
@@ -151,22 +147,32 @@ def main():
         elastic = ElasticHelpers(module)
         client = elastic.connect()
 
-        ct = get_component_template(module, client, name)
+        before = get_component_template(module, client, name)
+        if before is not None:
+            before = before['component_templates'][0]['component_template']
         response = None
 
-        if ct is None:
+        if before is None:
             if state == "present":
                 if module.check_mode is False:
                     response = put_component_template(module, client, name)
-                module.exit_json(changed=True, msg="The component template {0} was successfully created: {1}".format(name, str(response)))
+                exit_json = {
+                    "changed": True,
+                    "msg": "The component template {0} was successfully created: {1}".format(name, str(response)),
+                }
+                module.exit_json(**exit_json)
             elif state == "absent":
                 module.exit_json(changed=False, msg="The component template {0} does not exist.".format(name))
         else:
             if state == "present":
-                if component_template_is_different(ct['component_templates'][0]['component_template'], module):
+                if component_template_is_different(before, module):
                     if module.check_mode is False:
                         response = put_component_template(module, client, name)
-                    module.exit_json(changed=True, msg="The component template {0} was successfully updated: {1} {2}".format(name, str(response), str(ct)))
+                    exit_json = {
+                        "changed": True,
+                        "msg": "The component template {0} was successfully updated: {1}".format(name, str(response)),
+                    }
+                    module.exit_json(**exit_json)
                 else:
                     module.exit_json(changed=False, msg="The component template {0} already exists as configured.".format(name))
             elif state == "absent":

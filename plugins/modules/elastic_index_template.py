@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2021, Rhys Campbell (@rhysmeister) <rhys.james.campbell@googlemail.com>
+# Copyright: (c) 2023, Jean-Pierre Matsumoto (@jpmat296) <jpmat296@googlemail.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
@@ -123,8 +123,8 @@ def main():
 
     argument_spec = elastic_common_argument_spec()
     argument_spec.update(
-        state=dict(type='str', choices=state_choices, default='present'),
         name=dict(type='str', required=True),
+        state=dict(type='str', choices=state_choices, default='present'),
         src=dict(type='str', required=False),
     )
 
