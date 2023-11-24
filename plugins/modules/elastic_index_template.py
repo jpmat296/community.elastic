@@ -157,8 +157,8 @@ def main():
                 exit_json = {
                     "changed": True,
                     "msg": "The index_template {0} was successfully created: {1}".format(name, str(response)),
+                    "diff": {"after": index_template_from_file(module.params['src'])} if module._diff else None,
                 }
-                exit_json = {**exit_json, "diff": {"after": index_template_from_file(module.params['src'])}} if module._diff else exit_json
                 module.exit_json(**exit_json)
             elif state == "absent":
                 module.exit_json(changed=False, msg="The index_template {0} does not exist.".format(name))
@@ -170,8 +170,8 @@ def main():
                     exit_json = {
                         "changed": True,
                         "msg": "The index_template {0} was successfully updated: {1}".format(name, str(response)),
+                        "diff": {"before": before, "after": index_template_from_file(module.params['src'])} if module._diff else None,
                     }
-                    exit_json = {**exit_json, "diff": {"before": before, "after": index_template_from_file(module.params['src'])}} if module._diff else exit_json
                     module.exit_json(**exit_json)
                 else:
                     module.exit_json(changed=False, msg="The index_template {0} already exists as configured.".format(name))
