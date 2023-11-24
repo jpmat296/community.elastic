@@ -135,8 +135,6 @@ jobs:
         elastic_module: ${{ fromJson(needs.integration_matrix.outputs.matrix) }}
         ansible_version_combinations:
           - ansible_version: stable-2.13
-            python_version: "3.6"
-          - ansible_version: stable-2.13
             python_version: "3.9"
           - ansible_version: stable-2.14
             python_version: "3.10"
