@@ -34,15 +34,10 @@ jobs:
           - stable-2.16
         # - devel
           - milestone
-    # Ansible-test on various stable branches does not yet work well with cgroups v2.
-    # Since ubuntu-latest now uses Ubuntu 22.04, we need to fall back to the ubuntu-20.04
-    # image for these stable branches. The list of branches where this is necessary will
-    # shrink over time, check out https://github.com/ansible-collections/news-for-maintainers/issues/28
-    # for the latest list.
     runs-on: >-
       ${{ contains(fromJson(
           '["stable-2.9", "stable-2.10", "stable-2.11"]'
-      ), matrix.ansible) && 'ubuntu-20.04' || 'ubuntu-latest' }}
+      ), matrix.ansible) && 'ubuntu-24.04' || 'ubuntu-latest' }}
     steps:
 
       # Run sanity tests inside a Docker container.
@@ -66,23 +61,23 @@ jobs:
           pull-request-change-detection: true
 
   #units:
-  #  runs-on: ubuntu-20.04
+  #  runs-on: ubuntu-24.04
   #  defaults:
   #    run:
   #      working-directory: ansible_collections/community/elastic
   #  steps:
   #    - name: Check out code
-  #      uses: actions/checkout@v3
+  #      uses: actions/checkout@v4
   #      with:
   #        path: ansible_collections/community/elastic
 
   #    - name: Set up Python 3.6
-  #      uses: actions/setup-python@v4
+  #      uses: actions/setup-python@v5
   #      with:
   #        python-version: 3.6
 
   #    - name: Install ansible-base (devel)
-  #      uses: nick-invision/retry@v2
+  #      uses: nick-invision/retry@v3
   #      with:
   #        timeout_minutes: 3
   #        max_attempts: 3
@@ -99,7 +94,7 @@ jobs:
   #        fail_ci_if_error: false
 
   integration_matrix:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: ansible_collections/community/elastic
@@ -109,7 +104,7 @@ jobs:
     steps:
 
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: ansible_collections/community/elastic
 
@@ -126,7 +121,7 @@ jobs:
 
   integration:
     needs: integration_matrix
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: ansible_collections/community/elastic
@@ -143,7 +138,7 @@ jobs:
           - ansible_version: stable-2.16
             python_version: "3.11"
           - ansible_version: milestone
-            python_version: "3.11"
+            python_version: "3.13"
         elasticsearch_version_combinations:
           - elasticsearch_version: 7.10.1
             kibana_version: 7.10.1
@@ -155,38 +150,38 @@ jobs:
     steps:
 
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: ansible_collections/community/elastic
 
       - name: Set up Python ${{ matrix.ansible_version_combinations.python_version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.ansible_version_combinations.python_version }}
 
       - name: Install python packages
-        uses: nick-invision/retry@v2
+        uses: nick-invision/retry@v3
         with:
           timeout_minutes: 3
           max_attempts: 3
           command: pip install docker ${{ matrix.elasticsearch_version_combinations.elasticsearch_python_lib }} requests coverage
 
       - name: Install ansible-base (${{ matrix.ansible_version_combinations.ansible_version }})
-        uses: nick-invision/retry@v2
+        uses: nick-invision/retry@v3
         with:
           timeout_minutes: 3
           max_attempts: 3
           command: pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible_version_combinations.ansible_version }}.tar.gz --disable-pip-version-check
 
       - name: Install community.general
-        uses: nick-invision/retry@v2
+        uses: nick-invision/retry@v3
         with:
           timeout_minutes: 3
           max_attempts: 3
           command: ansible-galaxy collection install community.general -p ansible_collections/
 
       - name: Install community.docker
-        uses: nick-invision/retry@v2
+        uses: nick-invision/retry@v3
         with:
           timeout_minutes: 3
           max_attempts: 3

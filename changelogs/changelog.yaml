@@ -10,5 +10,47 @@ releases:
       This collection now supports elastic 8.
     changes:
       minor_changes:
-        - 58 Include support for elastic 8 as well as support 
+        - 58 Include support for elastic 8 as well as support
           for version 8 of the elastic python driver.
+  1.1.1:
+    release_summary: |
+      This collection now supports elastic 8.
+    changes:
+      bugfixes:
+        - 91 - elastic_rollup - Remove headers field from api request.
+  1.1.2:
+    release_summary: |
+      This is a maintenance release.
+    changes:
+      bugfixes:
+        - 95 - elastic_snapshot_repository - Updates call to create_respository function to match new api.
+  1.1.3:
+    release_summary: |
+      This is a maintenance release.
+    changes:
+      minor_changes:
+        - 100 - elastic_role - Fix typo in examples block.
+  1.2.0:
+    release_summary: |
+      This is a maintenance release.
+    minor_changes:
+        - 103 - All modules - Adds api key authentication via new parameter
+          api_key_encoded. Should be supplied as a base64-encoded string of the id and api_key joined by a colon e.g. <id>:<api_key>.
+          See the elastic documentation for [api_key](https://www.elastic.co/guide/en/elasticsearch/reference/current/security-api-create-api-key.html)
+          for further details.
+  1.2.1:
+    release_summary: |
+      This is a maintenance release.
+    minor_changes:
+      - 109 - Allow manual specification of login host connection url. 
+        This allows for the specification of the connection URL manually 
+        for the hosts in the case they are different or require a connection 
+        string not supported currently (eg. path).
+  1.2.2:
+    release_summary: |
+      This is a maintenance release.
+    bugfixes:
+      - 113 connection_options to dict (#114). This parameter 
+        was incorrectly specified as a list od dicts rather
+        than a dict. This did not work at all and is now corrected.
+    

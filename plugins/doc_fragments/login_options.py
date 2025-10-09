@@ -13,6 +13,7 @@ options:
     choices:
        - ''
        - http_auth
+       - api_key
     default: ''
   auth_scheme:
     description:
@@ -29,9 +30,8 @@ options:
   connection_options:
     description:
       - Additional connection options for Elasticsearch
-    type: list
-    elements: dict
-    default: []
+    type: dict
+    default: {}
   login_user:
     description:
       - The Elastic user to login with.
@@ -47,6 +47,8 @@ options:
   login_hosts:
     description:
       - The Elastic hosts to connect to.
+      - Can accept hostnames or URLs. If a hostname then values\
+        login_port and login_scheme will be used to construct a URL.
     required: no
     type: list
     elements: str
@@ -57,6 +59,14 @@ options:
     required: no
     type: int
     default: 9200
+  api_key_encoded:
+    description:
+      - API key credentials which is the Base64-encoding of the UTF-8\
+        representation of the id and api_key joined by a colon (:).
+      - Supported from Elastic 8+.
+      - See [Create API Key](https://www.elastic.co/guide/en/elasticsearch/reference/current/security-api-create-api-key.html) documentation for specifics.
+    required: no
+    type: str
   timeout:
     description:
       - Response timeout in seconds.

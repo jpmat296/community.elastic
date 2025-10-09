@@ -7,19 +7,19 @@ on:
 jobs:
   build_publish:
 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: ansible_collections/community/elastic
     steps:
 
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: ansible_collections/community/elastic
 
       - name: Set up Python 3.10
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
@@ -33,7 +33,7 @@ jobs:
         run: mv community-elastic-*.tar.gz community-elastic-latest.tar.gz
 
       - name: Upload community-elastic-latest.tar.gz as an artifact
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v4
         with:
           name: community-elastic-latest
           path: ansible_collections/community/elastic/community-elastic-latest.tar.gz
@@ -48,7 +48,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload files to release
-        uses: svenstaro/upload-release-action@v2
+        uses: svenstaro/upload-release-action@v3
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: ansible_collections/community/elastic/community-elastic-latest.tar.gz
