@@ -97,17 +97,11 @@ def get_policy(client, name):
     Gets the policy document specified by name. Full Opensearch response is returned.
     '''
     try:
-        # with open("/Users/jpmat/test.log", "a") as f:
-        #     print("before policy_doc", file=f)
         resp = client.transport.perform_request(
-          "GET",
-          f"/_plugins/_ism/policies/{name}"
+            "GET",
+            "/_plugins/_ism/policies/{0}".format(name)
         )
-        # with open("/Users/jpmat/test.log", "a") as f:
-        #     print("policy_doc resp", resp, file=f)
     except Exception as e:
-        # with open("/Users/jpmat/test.log", "a") as f:
-        #     print("Exception", e, file=f)
         resp = None
     except NotFoundError:
         resp = None
@@ -124,7 +118,7 @@ def put_policy(client, name, body, current_policy=None):
         params['if_primary_term'] = current_policy['_primary_term']
     policy_doc = client.transport.perform_request(
         "PUT",
-        f"/_plugins/_ism/policies/{name}",
+        "/_plugins/_ism/policies/{0}".format(name),
         body=body,
         params=params,
     )['policy']
@@ -136,10 +130,10 @@ def delete_policy(client, name):
     Deletes the policy specified by name
     '''
     try:
-      resp = client.transport.perform_request(
-          "DELETE",
-          f"/_plugins/_ism/policies/{name}"
-      )
+        resp = client.transport.perform_request(
+            "DELETE",
+            "/_plugins/_ism/policies/{0}".format(name)
+        )
     except NotFoundError:
         resp = None
     return resp
