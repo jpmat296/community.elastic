@@ -17,7 +17,7 @@ except ImportError:
 
 try:
     from opensearchpy import OpenSearch
-    from elasticsearch.exceptions import NotFoundError  # pylint: disable=unused-import
+    from opensearchpy.exceptions import NotFoundError  # pylint: disable=unused-import
     from elasticsearch import helpers  # pylint: disable=unused-import
     from elasticsearch import __version__  # pylint: disable=unused-import
 

@@ -1,0 +1,212 @@
+---
+- vars:
+    elastic_index_parameters: &elastic_index_parameters
+      timeout: 30
+      login_hosts: https://admin:P@szw0rd1!@localhost:9200
+      connection_options:
+        verify_certs: false
+        use_ssl: true
+
+  block:
+
+  - name: Create an ISM Policy with Check Mode
+    community.elastic.opensearch_ism:
+      name: mypolicy
+      policy:
+        description: daily rollover then delete
+        default_state: hot
+        states:
+        - name: hot
+          actions:
+          - rollover:
+              min_index_age: 1d
+          transitions:
+          - state_name: delete
+            conditions:
+              min_index_age: 7d
+        - name: delete
+          actions:
+          - delete: {}
+          transitions: []
+        ism_template:
+          index_patterns: [
+            myindex-*
+          ]
+      <<: *elastic_index_parameters
+    check_mode: yes
+    register: result
+
+  - assert:
+      that:
+        - result.msg == "The ISM Policy 'mypolicy' was created."
+        - result.changed == True
+
+  - name: Create an ISM Policy
+    community.elastic.opensearch_ism:
+      name: mypolicy
+      policy:
+        description: daily rollover then delete
+        default_state: hot
+        states:
+        - name: hot
+          actions:
+          - rollover:
+              min_index_age: 1d
+          transitions:
+          - state_name: delete
+            conditions:
+              min_index_age: 7d
+        - name: delete
+          actions:
+          - delete: {}
+          transitions: []
+        ism_template:
+          index_patterns: [
+            myindex-*
+          ]
+      <<: *elastic_index_parameters
+    register: result
+
+  - assert:
+      that:
+        - result.msg == "The ISM Policy 'mypolicy' was created."
+        - result.changed == True
+
+  - name: Run same ISM Policy Again
+    community.elastic.opensearch_ism:
+      name: mypolicy
+      policy:
+        description: daily rollover then delete
+        default_state: hot
+        states:
+        - name: hot
+          actions:
+          - rollover:
+              min_index_age: 1d
+          transitions:
+          - state_name: delete
+            conditions:
+              min_index_age: 7d
+        - name: delete
+          actions:
+          - delete: {}
+          transitions: []
+        ism_template:
+        - index_patterns: [ myindex-* ]
+          priority: 0
+      <<: *elastic_index_parameters
+    register: result
+
+  - debug: var=result
+  - assert:
+      that:
+        - result.msg == "The ISM Policy 'mypolicy' is already configured as specified."
+        - result.changed == False
+
+  - name: Update the policy with check mode
+    community.elastic.opensearch_ism:
+      name: mypolicy
+      policy:
+        description: daily rollover then delete
+        default_state: hot
+        states:
+        - name: hot
+          actions:
+          - rollover:
+              min_index_age: 2d
+          transitions:
+          - state_name: delete
+            conditions:
+              min_index_age: 7d
+        - name: delete
+          actions:
+          - delete: {}
+          transitions: []
+        ism_template:
+        - index_patterns: [ myindex-* ]
+          priority: 0
+      <<: *elastic_index_parameters
+    check_mode: yes
+    register: result
+
+  - assert:
+      that:
+        - result.msg == "The ISM Policy 'mypolicy' was updated."
+        - result.changed == True
+
+  - name: Update the policy
+    community.elastic.opensearch_ism:
+      name: mypolicy
+      policy:
+        description: daily rollover then delete
+        default_state: hot
+        states:
+        - name: hot
+          actions:
+          - rollover:
+              min_index_age: 2d
+          transitions:
+          - state_name: delete
+            conditions:
+              min_index_age: 7d
+        - name: delete
+          actions:
+          - delete: {}
+          transitions: []
+        ism_template:
+        - index_patterns: [ myindex-* ]
+          priority: 0
+      <<: *elastic_index_parameters
+    register: result
+
+  - assert:
+      that:
+        - result.msg == "The ISM Policy 'mypolicy' was updated."
+        - result.changed == True
+
+  - name: Flush all data in the cluster
+    shell: curl -kX POST -u 'admin:P@szw0rd1!' "https://localhost:9200/_flush?pretty"
+
+  - pause:
+      seconds: 5
+
+  # TODO verification of mypolicy
+  - name: Debug step
+    shell: curl -kX GET -u 'admin:P@szw0rd1!' "https://localhost:9200/_plugins/_ism/policies"
+
+  - name: Delete an ISM Policy with check mode
+    community.elastic.opensearch_ism:
+      name: mypolicy
+      state: absent
+      <<: *elastic_index_parameters
+    check_mode: yes
+    register: result
+
+  - assert:
+      that:
+        - result.msg == "The ISM Policy 'mypolicy' was deleted."
+        - result.changed == True
+
+  - name: Delete an ISM Policy
+    community.elastic.opensearch_ism:
+      name: mypolicy
+      state: absent
+      <<: *elastic_index_parameters
+    register: result
+
+  - assert:
+      that:
+        - result.msg == "The ISM Policy 'mypolicy' was deleted."
+        - result.changed == True
+
+  - name: Attempt delete ISM Policy Again
+    community.elastic.opensearch_ism:
+      name: mypolicy
+      state: absent
+      <<: *elastic_index_parameters
+    register: result
+
+  - assert:
+      that:
+        - result.msg == "The ISM Policy 'mypolicy' does not exist."
+        - result.changed == False
