@@ -164,7 +164,7 @@ jobs:
         with:
           timeout_minutes: 3
           max_attempts: 3
-          command: pip install docker opensearch-py ${{ matrix.elasticsearch_version_combinations.elasticsearch_python_lib }} requests coverage
+          command: pip install docker opensearch-py dictdiffer ${{ matrix.elasticsearch_version_combinations.elasticsearch_python_lib }} requests coverage
 
       - name: Install ansible-base (${{ matrix.ansible_version_combinations.ansible_version }})
         uses: nick-invision/retry@v3

@@ -87,6 +87,8 @@ from ansible_collections.community.elastic.plugins.module_utils.elastic_common i
 # import ism helpers from module_utils
 from ansible_collections.community.elastic.plugins.module_utils.ism_utils import (
     ism_is_different,
+    dictdiffer_found,
+    DICTDIFF_IMP_ERR,
 )
 
 
@@ -171,6 +173,10 @@ def main():
     if not elastic_found:
         module.fail_json(msg=missing_required_lib('elasticsearch'),
                          exception=E_IMP_ERR)
+
+    if not dictdiffer_found:
+        module.fail_json(msg=missing_required_lib('dictdiffer'),
+                         exception=DICTDIFF_IMP_ERR)
 
     name = module.params['name']
     state = module.params['state']

@@ -8,7 +8,18 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 import copy
-from dictdiffer import diff as dict_diff
+import traceback
+
+dictdiffer_found = False
+dict_diff = None
+DICTDIFF_IMP_ERR = None
+
+try:
+    from dictdiffer import diff as dict_diff
+    dictdiffer_found = True
+except ImportError:
+    DICTDIFF_IMP_ERR = traceback.format_exc()
+    dictdiffer_found = False
 
 policy_runtime_fields = [
     'policy_id',
