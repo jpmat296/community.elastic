@@ -1,0 +1,162 @@
+---
+- vars:
+    elastic_index_parameters: &elastic_index_parameters
+      timeout: 30
+      login_hosts: https://admin:P@szw0rd1!@localhost:9200
+      connection_options:
+        verify_certs: false
+        use_ssl: true
+
+  block:
+
+  - name: Create a simple index template
+    community.elastic.elastic_index_template:
+      name: mytemplate
+      state: present
+      src:  "{{ role_path }}/files/mytemplate.json"
+      <<: *elastic_index_parameters
+    register: elastic
+    diff: true
+
+  - assert:
+      that:
+        - "elastic.changed"
+        - "'The index_template mytemplate was successfully created' in elastic.msg"
+        - "elastic.diff.before is undefined"
+        - "elastic.diff.after | to_json(indent=4) | split('\n') | length == 36"
+
+  - name: Recreate same index template - no change
+    community.elastic.elastic_index_template:
+      name: mytemplate
+      state: present
+      src:  "{{ role_path }}/files/mytemplate.json"
+      <<: *elastic_index_parameters
+    register: elastic
+    diff: true
+
+- assert:
+    that:
+      - "elastic.changed == False"
+      - "elastic.msg == 'The index_template mytemplate already exists as configured.'"
+      - "elastic.diff is undefined"
+
+- name: Update the index template
+  community.elastic.elastic_index_template:
+    name: mytemplate
+    state: present
+    src:  "{{ role_path }}/files/mytemplate_v2.json"
+    <<: *elastic_index_parameters
+  register: elastic
+  diff: true
+
+- assert:
+    that:
+      - "elastic.changed"
+      - "'The index_template mytemplate was successfully updated' in elastic.msg"
+      - "elastic.diff.before is defined"
+      - "elastic.diff.after is defined"
+      - "(elastic.diff.after | to_json(indent=4) | split('\n') | length) -  (elastic.diff.before | to_json(indent=4) | split('\n') | length) == 3"
+
+- name: Delete the index template
+  community.elastic.elastic_index_template:
+    name: mytemplate
+    state: absent
+    <<: *elastic_index_parameters
+  register: elastic
+  diff: true
+
+- assert:
+    that:
+      - "elastic.changed"
+      - elastic.msg == 'The index_template mytemplate was deleted.'
+      - "elastic.diff is undefined"
+
+- name: Add a new index template with check mode
+  community.elastic.elastic_index_template:
+    name: mytemplate
+    state: present
+    src:  "{{ role_path }}/files/mytemplate.json"
+    <<: *elastic_index_parameters
+  register: elastic
+  check_mode: yes
+
+- assert:
+    that:
+      - "elastic.changed"
+      - "'The index_template mytemplate was successfully created' in elastic.msg"
+
+- name: Add new index template
+  community.elastic.elastic_index_template:
+    name: mytemplate
+    state: present
+    src:  "{{ role_path }}/files/mytemplate.json"
+    <<: *elastic_index_parameters
+  register: elastic
+  check_mode: no
+
+- assert:
+    that:
+      - "elastic.changed"
+      - "'The index_template mytemplate was successfully created' in elastic.msg"
+
+- name: Modify index template check mode
+  community.elastic.elastic_index_template:
+    name: mytemplate
+    state: present
+    src:  "{{ role_path }}/files/mytemplate_v2.json"
+    <<: *elastic_index_parameters
+  register: elastic
+  check_mode: yes
+  diff: true
+
+- assert:
+    that:
+      - "elastic.changed"
+      - "'The index_template mytemplate was successfully updated' in elastic.msg"
+      - "elastic.diff.before is defined"
+      - "elastic.diff.after is defined"
+      - "(elastic.diff.after | to_json(indent=4) | split('\n') | length) -  (elastic.diff.before | to_json(indent=4) | split('\n') | length) == 3"
+
+- name: Modify index template
+  community.elastic.elastic_index_template:
+    name: mytemplate
+    state: present
+    src:  "{{ role_path }}/files/mytemplate_v2.json"
+    <<: *elastic_index_parameters
+  register: elastic
+  check_mode: no
+  diff: true
+
+- assert:
+    that:
+      - "elastic.changed"
+      - "'The index_template mytemplate was successfully updated' in elastic.msg"
+      - "elastic.diff.before is defined"
+      - "elastic.diff.after is defined"
+      - "(elastic.diff.after | to_json(indent=4) | split('\n') | length) -  (elastic.diff.before | to_json(indent=4) | split('\n') | length) == 3"
+
+- name: Delete index template check mode
+  community.elastic.elastic_index_template:
+    name: mytemplate
+    state: absent
+    <<: *elastic_index_parameters
+  register: elastic
+  check_mode: yes
+
+- assert:
+    that:
+      - "elastic.changed"
+      - "elastic.msg == 'The index_template mytemplate was deleted.'"
+
+- name: Delete index template
+  community.elastic.elastic_index_template:
+    name: mytemplate
+    state: absent
+    <<: *elastic_index_parameters
+  register: elastic
+  check_mode: no
+
+- assert:
+    that:
+      - "elastic.changed"
+      - "elastic.msg == 'The index_template mytemplate was deleted.'"
