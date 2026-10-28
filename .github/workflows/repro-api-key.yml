@@ -35,7 +35,7 @@ jobs:
       - name: Install collections
         # Same location as CI's nick-invision/retry step, which runs from the workspace root
         working-directory: ${{ github.workspace }}
-        run:ansible-galaxy collection install community.general community.docker -p ansible_collections/
+        run: ansible-galaxy collection install community.general community.docker -p ansible_collections/
 
       - name: Set integration_config.yml
         run: |
