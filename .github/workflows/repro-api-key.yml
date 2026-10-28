@@ -33,7 +33,9 @@ jobs:
         run: pip install https://github.com/ansible/ansible/archive/stable-2.18.tar.gz --disable-pip-version-check
 
       - name: Install collections
-        run: ansible-galaxy collection install community.general community.docker -p ansible_collections/
+        # Same location as CI's nick-invision/retry step, which runs from the workspace root
+        working-directory: ${{ github.workspace }}
+        run:ansible-galaxy collection install community.general community.docker -p ansible_collections/
 
       - name: Set integration_config.yml
         run: |
