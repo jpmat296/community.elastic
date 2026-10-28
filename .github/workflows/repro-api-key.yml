@@ -1,0 +1,44 @@
+name: Repro elastic_api_key
+on:
+  push:
+    branches: [ci-repro-api-key]
+  workflow_dispatch:
+
+jobs:
+  integration:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: ansible_collections/community/elastic
+    strategy:
+      fail-fast: false
+      matrix:
+        attempt: [1, 2, 3, 4, 5, 6, 7, 8]
+    name: elastic_api_key stable-2.18 py3.13 ES 9.3.0 (#${{ matrix.attempt }})
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v6
+        with:
+          path: ansible_collections/community/elastic
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Install python packages
+        run: pip install docker elasticsearch==9.* requests coverage
+
+      - name: Install ansible-core (stable-2.18)
+        run: pip install https://github.com/ansible/ansible/archive/stable-2.18.tar.gz --disable-pip-version-check
+
+      - name: Install collections
+        run: ansible-galaxy collection install community.general community.docker -p ansible_collections/
+
+      - name: Set integration_config.yml
+        run: |
+          echo "elasticsearch_version: 9.3.0" >> tests/integration/integration_config.yml
+          echo "kibana_version: 9.3.0" >> tests/integration/integration_config.yml
+
+      - name: Run integration tests
+        run: ansible-test integration -v --color --retry-on-error --python 3.13 --continue-on-error --diff elastic_api_key
