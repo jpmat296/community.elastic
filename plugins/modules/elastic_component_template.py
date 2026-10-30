@@ -105,10 +105,16 @@ def put_component_template(module, client, name):
     return response
 
 
+READ_ONLY_FIELDS = ('created_date_millis', 'modified_date_millis', 'created_date', 'modified_date')
+
+
 def component_template_is_different(current_ct, module):
     '''
     Check if component template is different
     '''
+    current_ct = dict(current_ct)
+    for field in READ_ONLY_FIELDS:
+        current_ct.pop(field, None)
     str1 = json.dumps(current_ct, sort_keys=True)
     str2 = json.dumps(component_template_from_file(module.params['src']), sort_keys=True)
     return str1 != str2
