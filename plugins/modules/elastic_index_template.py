@@ -67,6 +67,9 @@ from ansible_collections.community.elastic.plugins.module_utils.elastic_common i
 )
 
 
+READ_ONLY_FIELDS = ('created_date_millis', 'modified_date_millis', 'created_date', 'modified_date')
+
+
 def index_template_from_file(src):
     with open(src) as f:
         return json.loads(f.read())
@@ -148,6 +151,8 @@ def main():
         before = get_index_template(module, client, name)
         if before is not None:
             before = before['index_templates'][0]['index_template']
+            for field in READ_ONLY_FIELDS:
+                before.pop(field, None)
         response = None
 
         if before is None:
